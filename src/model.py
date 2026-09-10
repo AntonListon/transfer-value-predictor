@@ -13,6 +13,7 @@ df = get_player_data()
 # Dataprocessing
 # Removes the name due to irrelevance and convert the positions into true/false variables (one-hot encoding)
 df_features = df.drop(columns=['name'])
+df_features = df.drop(columns=['name', 'nationality'])
 df_encoded = pd.get_dummies(df_features, columns=['position'], drop_first=True)
 
 # Split the data into features(X) and target variable(y)
@@ -33,15 +34,15 @@ mse = mean_squared_error(y_test, predictions)
 print("\n--- Model Trained Succesfully ---")
 print(f"Mean Squared Error on test-data: {mse:.2f}")
 
-# Test with a new dummy player based on the data in fetch_data.py
-player = pd.DataFrame([{
-    'age': 24,
-    'minutes': 2000,
-    'goals': 4,
-    'assists': 6,
-    'position_Forward': False,
-    'position_Midfielder': True
-}])
+# Test with a new dummy player based on the dataset
+player = pd.DataFrame(0, index=[0], columns=X.columns)
+player['age'] = 24
+player['minutes'] = 2000
+player['goals'] = 4
+player['assists'] = 6
+
+if 'position_OS' in player.columns:
+    player['position_OS'] = 1
 
 estimated_value = model.predict(player)
 print(f"\nEstimated value of the player: {estimated_value[0]:.2f} million euros")

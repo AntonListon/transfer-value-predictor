@@ -2,16 +2,34 @@
 
 import pandas as pd
 
-## DUMMY DATA
+# Load Dataset
 def get_player_data():
-    raw_data = [
-        {"name": "Player A", "age": 22, "minutes": 2100, "goals": 15, "assists": 5, "position": "Forward", "value_m_euro": 50.0},
-        {"name": "Player B", "age": 28, "minutes": 3200, "goals": 2, "assists": 10, "position": "Midfielder", "value_m_euro": 45.0},
-        {"name": "Player C", "age": 25, "minutes": 1500, "goals": 0, "assists": 2, "position": "Defender", "value_m_euro": 15.0},
-        {"name": "Player D", "age": 21, "minutes": 1800, "goals": 5, "assists": 8, "position": "Midfielder", "value_m_euro": 30.0},
-        {"name": "Player E", "age": 30, "minutes": 2800, "goals": 20, "assists": 3, "position": "Forward", "value_m_euro": 60.0}
-    ]
-    return pd.DataFrame(raw_data)
+    df = pd.read_csv('data/dataset.csv')
+    # Rewriting the turkish column names to english
+    column_mapping = {
+        'Oyuncu': 'name',
+        'Yaş': 'age',
+        'Uyruk': 'nationality',
+        'Mevki': 'position',
+        'DK': 'minutes',
+        'GLS': 'goals',
+        'AST': 'assists',
+        'Bonservis': 'value_m_euro'
+    }
+
+    df = df.rename(columns=column_mapping)
+
+    selected_columns = ['name', 'age', 'position', 'minutes', 'goals', 'assists', 'xG', 'xA', 'KEYP', 'value_m_euro']
+    # removes all but selected columns
+    df = df[selected_columns].dropna()
+
+    # remove "." from value in the dataset and convert to millions (EURO)
+    df['value_m_euro'] = df['value_m_euro'].astype(str).str.replace('.', '', regex=False)
+    df['value_m_euro'] = pd.to_numeric(df['value_m_euro'], errors='coerce')
+    df['value_m_euro'] = df['value_m_euro'] / 1000000
+
+    return df
+
 
 if __name__ == "__main__":
     df = get_player_data()
